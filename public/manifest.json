@@ -1,7 +1,7 @@
 {
   "theme_color": "#f0c497",
   "background_color": "#f69435",
-  "display": "standalone",
+  "display": "fullscreen",
   "scope": "/",
   "start_url": "/",
   "name": "Nisubhs",
