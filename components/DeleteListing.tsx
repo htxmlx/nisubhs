@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Button } from './ui/button'
-import { deletePost } from '@/lib/actions'
+import { deletePost } from '@/lib/actions.listing'
 
 export default function DeleteListing({ postId }: { postId: string }) {
   const [isDeleting, setIsDeleting] = useState(false)
