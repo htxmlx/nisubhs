@@ -25,7 +25,7 @@ export default function Map({ data }: MapProps) {
   const { theme } = useTheme()
 
   const mapRef = useRef<MapRef>(null)
-  const [selectedCity, setSelectedCity] = useState<any>(null)
+  const [selectedCity, setSelectedCity] = useState<Post | null>(null)
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 5000])
   const [searchTerm, setSearchTerm] = useState('')
 

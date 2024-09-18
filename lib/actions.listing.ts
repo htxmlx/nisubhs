@@ -1,7 +1,7 @@
 'use server'
-import type { Post } from '@prisma/client'
 import prisma from '@/lib/prisma'
 import { auth, clerkClient } from '@clerk/nextjs/server'
+import type { Post } from '@prisma/client'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 

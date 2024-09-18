@@ -1,11 +1,10 @@
 import Section from '@/components/common/section'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import prisma from '@/lib/prisma'
-import Image from 'next/image'
-import { useSearchParams } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import type { Post } from '@prisma/client'
 import SearchInput from '@/components/SearchInput'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardTitle } from '@/components/ui/card'
+import prisma from '@/lib/prisma'
+import type { Post } from '@prisma/client'
+import Image from 'next/image'
 
 export default async function Page({
   searchParams,

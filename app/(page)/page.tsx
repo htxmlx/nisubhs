@@ -1,5 +1,5 @@
 import Section from '@/components/common/section'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardTitle } from '@/components/ui/card'
 import prisma from '@/lib/prisma'
 import Image from 'next/image'
 export default async function Page() {
