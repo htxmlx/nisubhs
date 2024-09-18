@@ -1,13 +1,11 @@
 {
-  "theme_color": "#f0c497",
-  "background_color": "#f69435",
-  "display": "fullscreen",
-  "scope": "/",
-  "start_url": "/",
   "name": "Nisubhs",
-  "orientation": "portrait",
   "short_name": "Nisubhs",
-  "description": "anime with retro feels",
+  "theme_color": "#FFFFFF",
+  "background_color": "#FFFFFF",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
   "icons": [
     {
       "src": "/icon-192x192.png",
