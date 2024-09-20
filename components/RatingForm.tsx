@@ -1,6 +1,6 @@
 'use client'
 
-import { createRating } from '@/lib/actions.rating'
+import { createRating, updateRating } from '@/lib/actions.rating'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { StarFilledIcon } from '@radix-ui/react-icons'
 import { useRouter } from 'next/navigation'
@@ -9,6 +9,7 @@ import { z } from 'zod'
 import { Button } from './ui/button'
 import { Label } from './ui/label'
 import { Textarea } from './ui/textarea'
+import type { Rating } from '@prisma/client'
 
 const ratingSchema = z.object({
   rating: z.number().min(1).max(5),
@@ -17,7 +18,13 @@ const ratingSchema = z.object({
 
 type RatingFormValues = z.infer<typeof ratingSchema>
 
-export default function RatingForm({ postId }: { postId: string }) {
+export default function RatingForm({
+  postId,
+  existingReview,
+}: {
+  postId: string
+  existingReview?: Rating
+}) {
   const {
     register,
     handleSubmit,
@@ -26,6 +33,10 @@ export default function RatingForm({ postId }: { postId: string }) {
     watch,
   } = useForm<RatingFormValues>({
     resolver: zodResolver(ratingSchema),
+    defaultValues: {
+      rating: existingReview ? existingReview.value : 0,
+      review: existingReview ? existingReview.review : '',
+    },
   })
 
   const router = useRouter()
@@ -35,7 +46,13 @@ export default function RatingForm({ postId }: { postId: string }) {
     review,
   }) => {
     try {
-      await createRating(postId, rating, review)
+      if (existingReview) {
+        // Update the existing review
+        await updateRating(postId, rating, review)
+      } else {
+        // Create a new review
+        await createRating(postId, rating, review)
+      }
       router.push(`/details?id=${postId}`)
     } catch (error) {
       console.error('An unexpected error occurred:', error)
@@ -84,7 +101,11 @@ export default function RatingForm({ postId }: { postId: string }) {
       </div>
 
       <Button className="mt-auto" type="submit" disabled={isSubmitting}>
-        {isSubmitting ? 'Submitting...' : 'Submit Rating'}
+        {isSubmitting
+          ? 'Submitting...'
+          : existingReview
+          ? 'Update Rating'
+          : 'Submit Rating'}
       </Button>
     </form>
   )

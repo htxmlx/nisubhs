@@ -1,4 +1,5 @@
 'use server'
+
 import type { Post, Rating } from '@prisma/client'
 import prisma from '@/lib/prisma'
 import { auth, clerkClient } from '@clerk/nextjs/server'
@@ -26,19 +27,45 @@ export async function createRating(
         value: rating,
         review,
         user_image: imageUrl,
-        user_name: fullName || '',
+        user_name: fullName || 'NA',
       },
     })
     revalidatePath('/profile')
     redirect('/profile')
-
-    console.log('success')
   } catch (error) {
     console.error('Error creating post:', error)
   }
 }
 
-export async function deletePost(postId: string) {
+export async function updateRating(
+  postId: string,
+  rating: number,
+  review: string
+) {
+  const { userId } = auth()
+
+  if (!userId) return
+
+  try {
+    // Update the existing rating
+    await prisma.rating.updateMany({
+      where: {
+        userId,
+        postId,
+      },
+      data: {
+        value: rating,
+        review,
+      },
+    })
+    revalidatePath(`/details?id=${postId}`)
+    redirect(`/details?id=${postId}`)
+  } catch (error) {
+    console.error('Error updating rating:', error)
+  }
+}
+
+export async function deleteRating(postId: string) {
   const { userId } = auth()
 
   if (!userId) {
@@ -46,8 +73,7 @@ export async function deletePost(postId: string) {
   }
 
   try {
-    // Find the post to ensure it exists and get its userId
-    const post = await prisma.post.findUnique({
+    const post = await prisma.rating.findUnique({
       where: { id: postId },
     })
 
@@ -55,17 +81,14 @@ export async function deletePost(postId: string) {
       throw new Error('Post not found')
     }
 
-    // Check if the authenticated user is the owner of the post
     if (post.userId !== userId) {
       throw new Error('User is not authorized to delete this post')
     }
 
-    // Proceed to delete the post
-    await prisma.post.delete({
+    await prisma.rating.delete({
       where: { id: postId },
     })
-    revalidatePath('/profile')
-    console.log('Post deleted successfully')
+    revalidatePath(`/details?id=${postId}`)
   } catch (error) {
     console.error('Error deleting post:', error)
     throw error

@@ -20,7 +20,7 @@ export default function Form() {
   const router = useRouter()
   const onSubmit: SubmitHandler<FormValues> = (data) => {
     createPost(data)
-    router.push('/profile')
+    router.refresh( )
   }
 
   function InputFieldError({ text = '' }: { text?: string }) {

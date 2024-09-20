@@ -21,6 +21,7 @@ import {
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { auth } from '@clerk/nextjs/server'
 
 export default async function Page({
   searchParams,
@@ -41,7 +42,19 @@ export default async function Page({
     },
   })
 
+  const { userId } = auth()
+
   if (!listing) return notFound()
+  if (!userId) return notFound()
+
+  const userReview = await prisma.rating.findUnique({
+    where: {
+      userId_postId: {
+        userId: userId,
+        postId: listing.id,
+      },
+    },
+  })
 
   return (
     <Section className="gap-5 flex flex-col justify-between pb-20">
@@ -94,7 +107,7 @@ export default async function Page({
 
       <div className="grid gap-4">
         <h2 className="text-2xl font-bold">What this place offers</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 gap-4">
           <div className="flex items-center gap-2">
             <BedIcon className="w-5 h-5" />
             <span>{listing.bedroom_no} Bedroom</span>
@@ -126,7 +139,10 @@ export default async function Page({
         <div className="grid gap-6">
           {listing.ratings.length > 0 ? (
             listing.ratings.map((rating) => (
-              <div key={rating.id} className="flex items-start gap-4">
+              <div
+                key={rating.id}
+                className="flex items-start gap-4 border p-2 rounded-lg"
+              >
                 <Avatar className="border w-11 h-11">
                   <AvatarImage
                     src={rating.user_image || '/placeholder-user.jpg'}
@@ -135,6 +151,7 @@ export default async function Page({
                   <AvatarFallback>{rating.user_name || 'U'}</AvatarFallback>
                 </Avatar>
                 <div className="grid gap-2">
+                  {rating.user_name || 'Unamed User'}
                   <div className="flex items-center gap-2 text-xs font-semibold">
                     <div className="flex items-center gap-1">
                       {Array.from({ length: 5 }, (_, index) => (
@@ -157,12 +174,24 @@ export default async function Page({
             <p>No reviews yet.</p>
           )}
         </div>
-        <Link
-          className={cn(buttonVariants(), 'w-full')}
-          href={`/review?id=${listing.id}`}
-        >
-          Add a Review
-        </Link>
+
+        {userReview ? (
+          <div className="flex gap-4">
+            <Link
+              className={cn(buttonVariants(), 'w-full')}
+              href={`/review?id=${listing.id}&action=edit`}
+            >
+              Edit My Review
+            </Link>
+          </div>
+        ) : (
+          <Link
+            className={cn(buttonVariants(), 'w-full')}
+            href={`/review?id=${listing.id}`}
+          >
+            Add a Review
+          </Link>
+        )}
       </div>
     </Section>
   )

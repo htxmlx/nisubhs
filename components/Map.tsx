@@ -1,14 +1,23 @@
 'use client'
 
-import { formatPrice } from '@/lib/utils'
+import { cn, formatPrice } from '@/lib/utils'
 import type { Post } from '@prisma/client'
 import { useTheme } from 'next-themes'
 import { useRef, useState } from 'react'
-import { MapRef, Map as MapGL, Marker } from 'react-map-gl'
+import {
+  MapRef,
+  Map as MapGL,
+  Marker,
+  NavigationControl,
+  GeolocateControl,
+} from 'react-map-gl'
 import { Badge } from './ui/badge'
 import { Card, CardContent, CardFooter, CardHeader } from './ui/card'
 import Image from 'next/image'
-import { Button } from './ui/button'
+import { Button, buttonVariants } from './ui/button'
+import Link from 'next/link'
+import MapFilter from './MapFilter'
+import { useSearchParams } from 'next/navigation'
 
 const TOKEN =
   'pk.eyJ1IjoiYXprcml2ZW4xNiIsImEiOiJjbGhma3IxaWcxN3c3M2VyM3VhcGsxcHk3In0.pto_0eshW9NHMP-m1O_blg'
@@ -23,11 +32,17 @@ interface MapProps {
 }
 export default function Map({ data }: MapProps) {
   const { theme } = useTheme()
+  const searchParams = useSearchParams()
 
   const mapRef = useRef<MapRef>(null)
+  const mapStyle = searchParams.get('mapStyle')
   const [selectedCity, setSelectedCity] = useState<Post | null>(null)
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 5000])
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
+  const [currentMapStyle, setCurrentMapStyle] = useState<string>(
+    mapStyle || (theme === 'dark' ? mapStyles.dark : mapStyles.light)
+  )
 
   const filteredData = data.filter((city) => {
     const price = Number(city.price)
@@ -37,6 +52,10 @@ export default function Map({ data }: MapProps) {
       .includes(searchTerm.toLowerCase())
     return withinPriceRange && matchesSearchTerm
   })
+
+  const handleStyleChange = (val: string) => {
+    setCurrentMapStyle(val)
+  }
 
   const pins = filteredData.map((city, index) => (
     <Marker
@@ -51,7 +70,7 @@ export default function Map({ data }: MapProps) {
           mapRef.current?.flyTo({
             center: [city.longitude, city.latitude],
             essential: true,
-            zoom: 18,
+            zoom: 14,
             speed: 5,
             curve: 1,
             easing: (t: number) => t,
@@ -64,6 +83,15 @@ export default function Map({ data }: MapProps) {
   ))
   return (
     <>
+      <MapFilter
+        priceRange={priceRange}
+        searchTerm={searchTerm}
+        setIsDrawerOpen={setIsDrawerOpen}
+        setPriceRange={setPriceRange}
+        setSearchTerm={setSearchTerm}
+        currentMapStyle={currentMapStyle}
+        handleStyleChange={handleStyleChange} // Pass the style change handler
+      />
       <MapGL
         ref={mapRef}
         initialViewState={{
@@ -83,6 +111,9 @@ export default function Map({ data }: MapProps) {
         onClick={(e) => alert(e.lngLat)}
       >
         {pins}
+
+        <GeolocateControl position="top-left" />
+        <NavigationControl position="top-right" />
       </MapGL>
 
       {selectedCity && (
@@ -132,7 +163,9 @@ export const ListingCard = ({
       </p>
     </CardContent>
     <CardFooter>
-      <Button>More Info</Button>
+      <Link href={`/details?id=${item.id}`} className={cn(buttonVariants())}>
+        Mpre Info
+      </Link>
     </CardFooter>
   </Card>
 )
