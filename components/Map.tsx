@@ -27,9 +27,11 @@ const mapStyles = {
   dark: 'mapbox://styles/mapbox/dark-v11',
   satellite: 'mapbox://styles/mapbox/satellite-v9',
 }
+
 interface MapProps {
   data: Post[]
 }
+
 export default function Map({ data }: MapProps) {
   const { theme } = useTheme()
   const searchParams = useSearchParams()
@@ -38,59 +40,37 @@ export default function Map({ data }: MapProps) {
   const mapStyle = searchParams.get('mapStyle')
   const [selectedCity, setSelectedCity] = useState<Post | null>(null)
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 5000])
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-  const [searchTerm, setSearchTerm] = useState('')
   const [currentMapStyle, setCurrentMapStyle] = useState<string>(
     mapStyle || (theme === 'dark' ? mapStyles.dark : mapStyles.light)
   )
+  const [pin, setPin] = useState<{
+    latitude: number
+    longitude: number
+  } | null>(null) // Manage a single pin
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
-  const filteredData = data.filter((city) => {
-    const price = Number(city.price)
-    const withinPriceRange = price >= priceRange[0] && price <= priceRange[1]
-    const matchesSearchTerm = city.title
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase())
-    return withinPriceRange && matchesSearchTerm
+  const filteredData = data.filter((item) => {
+    const price = Number(item.price)
+    return price >= priceRange[0] && price <= priceRange[1]
   })
+
+  const handleMapClick = (e: any) => {
+    const { lng, lat } = e.lngLat
+    setPin({ latitude: lat, longitude: lng }) // Set the new pin
+  }
 
   const handleStyleChange = (val: string) => {
     setCurrentMapStyle(val)
   }
 
-  const pins = filteredData.map((city, index) => (
-    <Marker
-      key={`marker-${index}`}
-      longitude={city.longitude}
-      latitude={city.latitude}
-      anchor="bottom"
-      onClick={(e) => {
-        e.originalEvent.stopPropagation()
-        setSelectedCity(city)
-        if (mapRef.current) {
-          mapRef.current?.flyTo({
-            center: [city.longitude, city.latitude],
-            essential: true,
-            zoom: 14,
-            speed: 5,
-            curve: 1,
-            easing: (t: number) => t,
-          })
-        }
-      }}
-    >
-      <Badge>{formatPrice(Number(city.price))}</Badge>
-    </Marker>
-  ))
   return (
     <>
       <MapFilter
         priceRange={priceRange}
-        searchTerm={searchTerm}
         setIsDrawerOpen={setIsDrawerOpen}
         setPriceRange={setPriceRange}
-        setSearchTerm={setSearchTerm}
         currentMapStyle={currentMapStyle}
-        handleStyleChange={handleStyleChange} // Pass the style change handler
+        handleStyleChange={handleStyleChange}
       />
       <MapGL
         ref={mapRef}
@@ -101,16 +81,41 @@ export default function Map({ data }: MapProps) {
           bearing: 0,
           pitch: 0,
         }}
-        mapStyle={theme === 'dark' ? mapStyles.dark : mapStyles.light}
+        mapStyle={currentMapStyle}
         mapboxAccessToken={TOKEN}
         style={{
           height: '100vh',
           width: '100%',
           zIndex: 10,
         }}
-        onClick={(e) => alert(e.lngLat)}
+        onClick={handleMapClick} // Call handleMapClick on click
       >
-        {pins}
+        {filteredData.map((city, index) => (
+          <Marker
+            key={`marker-${index}`}
+            latitude={city.latitude}
+            longitude={city.longitude}
+            anchor="bottom"
+            onClick={(e) => {
+              e.originalEvent.stopPropagation()
+              setSelectedCity(city)
+            }}
+          >
+            <Badge>{formatPrice(Number(city.price))}</Badge>
+          </Marker>
+        ))}
+
+        {pin && ( // Render the pin if it exists
+          <Marker
+            latitude={pin.latitude}
+            longitude={pin.longitude}
+            anchor="bottom"
+          >
+            <Badge>{`Lat: ${pin.latitude.toFixed(
+              4
+            )}, Lng: ${pin.longitude.toFixed(4)}`}</Badge>
+          </Marker>
+        )}
 
         <GeolocateControl position="top-left" />
         <NavigationControl position="top-right" />
@@ -133,7 +138,7 @@ export const ListingCard = ({
   item: Post
   onClose: () => void
 }) => (
-  <Card className="z-50 fixed bottom-14 w-full">
+  <Card className="z-50 fixed bottom-14 w-full max-w-md">
     <CardHeader className="relative border-b w-full h-32">
       <Image
         fill
@@ -164,7 +169,7 @@ export const ListingCard = ({
     </CardContent>
     <CardFooter>
       <Link href={`/details?id=${item.id}`} className={cn(buttonVariants())}>
-        Mpre Info
+        More Info
       </Link>
     </CardFooter>
   </Card>
