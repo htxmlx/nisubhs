@@ -1,12 +1,35 @@
 import { CategoryTabs } from '@/components/CategoryTabs'
 import Section from '@/components/common/section'
+import SearchInput from '@/components/SearchInput'
 import prisma from '@/lib/prisma'
 import type { Post } from '@prisma/client'
 
-export default async function Page() {
+export default async function Page({
+  searchParams,
+}: {
+  searchParams?: { query: string }
+}) {
+  const query = searchParams?.query || ''
+
   const listings = await prisma.post.findMany({
     include: {
       ratings: true,
+    },
+    where: {
+      OR: [
+        {
+          title: {
+            contains: query,
+            mode: 'insensitive', // case-insensitive search
+          },
+        },
+        {
+          address: {
+            contains: query,
+            mode: 'insensitive',
+          },
+        },
+      ],
     },
   })
 
@@ -28,6 +51,7 @@ export default async function Page() {
   return (
     <Section>
       <h1 className="text-2xl font-bold mb-6">Featured Properties</h1>
+      <SearchInput />
       <CategoryTabs posts={postsWithRating} />
     </Section>
   )

@@ -2,7 +2,16 @@
 
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import { Home, Map, PlusSquare, Search, User } from 'lucide-react'
+import {
+  CircleHelp,
+  Computer,
+  Home,
+  Map,
+  PlusSquare,
+  Search,
+  User,
+  User2Icon,
+} from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
@@ -10,8 +19,8 @@ const navItems = [
   { href: '/', label: 'Home', icon: Home },
   { href: '/map', label: 'Map', icon: Map },
   { href: '/create', label: 'Create', icon: PlusSquare },
-  { href: '/search', label: 'Search', icon: Search },
-  { href: '/profile', label: 'Profile', icon: User },
+  { href: '/profile', label: 'Profile', icon: User2Icon },
+  { href: '/admin', label: 'Admin', icon: CircleHelp },
 ]
 
 export default function BottomNav() {

@@ -1,22 +1,38 @@
 import type { Post } from '@prisma/client'
-import { Card, CardContent, CardTitle } from '../ui/card'
+import { StarFilledIcon } from '@radix-ui/react-icons'
 import Image from 'next/image'
-import { Button } from '../ui/button'
-
-export function ListingCard(data: Post) {
-  const { id, address, images, title, price } = data
+import { Badge } from '../ui/badge'
+import { Card, CardContent } from '../ui/card'
+interface ListingCardProps extends Post {
+  averageRating: string
+}
+export function ListingCard({
+  id,
+  address,
+  images,
+  title,
+  price,
+  averageRating,
+}: ListingCardProps) {
   return (
-    <Card key={id}>
-      <CardContent className="mt-2">
-        <div className="relative aspect-video">
-          <Image src={images[0]} alt={title + 'image'} fill />
-        </div>
-        <CardTitle className="font-semibold">{title}</CardTitle>
-        <CardTitle className="text-muted-foreground">{address}</CardTitle>
+    <Card className="overflow-hidden">
+      <Image
+        src={images[0]}
+        alt={title}
+        height={300}
+        width={300}
+        className="aspect-video"
+      />
+      <CardContent className="p-4">
+        <h2 className="font-semibold text-lg">{title}</h2>
+        <p className="text-muted-foreground">{address}</p>
         <div className="flex justify-between items-center">
-          <p className="text-xl font-semibold">₱{price}.00</p>{' '}
-          <Button>More Info</Button>
+          <span className="font-bold text-lg">₱{price}/mo</span>
         </div>
+        <Badge variant="secondary" className="w-fit mt-2">
+          <StarFilledIcon className="h-4 w-4 mr-1 fill-primary" />
+          {averageRating}
+        </Badge>
       </CardContent>
     </Card>
   )
