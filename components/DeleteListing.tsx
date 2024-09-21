@@ -25,7 +25,7 @@ export default function DeleteListing({ postId }: { postId: string }) {
 
   return (
     <div>
-      <Button onClick={handleDelete} disabled={isDeleting}>
+      <Button size="sm" onClick={handleDelete} disabled={isDeleting}>
         {isDeleting ? 'Deleting...' : 'Delete Listing'}
       </Button>
       {error && <p style={{ color: 'red' }}>{error}</p>}

@@ -15,7 +15,7 @@ export default function Topbar() {
   return (
     <header className="sticky top-0 z-50 px-5 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 max-w-screen-2xl items-center">
-        <div className="flex items-center space-x-2">
+        <Link href="/" className="flex items-center space-x-2">
           <Image
             className="filter dark:invert invert-0"
             alt="Logo"
@@ -24,7 +24,7 @@ export default function Topbar() {
             width={30}
           />
           <span className="font-bold">{siteConfig.name}</span>
-        </div>
+        </Link>
         <div className="flex flex-1 items-center justify-end space-x-2">
           <Button
             variant="ghost"
