@@ -9,8 +9,7 @@ export default function Loading() {
           Loading...
         </h2>
         <p className="mt-2 text-sm sm:text-base text-muted-foreground max-w-xs sm:max-w-sm md:max-w-md mx-auto">
-          Please wait while we prepare your content. This may take a few
-          moments.
+          Please wait. This may take a few moments.
         </p>
       </div>
     </div>
