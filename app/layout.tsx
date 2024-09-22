@@ -1,10 +1,16 @@
 import { ClerkProvider } from '@clerk/nextjs'
 import type { Metadata } from 'next'
 import localFont from 'next/font/local'
-import './globals.css'
-import 'mapbox-gl/dist/mapbox-gl.css'
+
 import { ThemeProvider } from '@/components/ThemeProvider'
 import { siteConfig } from '@/config/site'
+import { Toaster } from '@/components/ui/toaster'
+import { NextSSRPlugin } from '@uploadthing/react/next-ssr-plugin'
+import { extractRouterConfig } from 'uploadthing/server'
+import { ourFileRouter } from '@/app/api/uploadthing/core'
+
+import './globals.css'
+import 'mapbox-gl/dist/mapbox-gl.css'
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
@@ -53,7 +59,6 @@ export const metadata: Metadata = {
   },
 }
 
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -84,6 +89,8 @@ export default function RootLayout({
           >
             {children}
           </ThemeProvider>
+          <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />
+          <Toaster />
         </body>
       </html>
     </ClerkProvider>

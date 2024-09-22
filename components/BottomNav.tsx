@@ -31,15 +31,12 @@ export default function BottomNav() {
                 'flex-1 flex-col h-full rounded-none',
                 isActive && 'bg-muted',
                 isCreateButton &&
-                  'relative flex items-center justify-center w-14 h-20 bg-gradient-to-br from-teal-400 to-pink-500 rounded-full rounded-r-none  shadow-lg glow' // Gradient styling for Create button
+                  'relative flex items-center justify-center w-14 h-20 bg-gradient-to-br from-teal-400 to-pink-500 rounded-full  shadow-lg glow' // Gradient styling for Create button
               )}
             >
               <Link href={item.href}>
                 <item.icon
-                  className={cn(
-                    isActive ? 'text-primary' : 'text-white',
-                    isCreateButton ? 'size-7' : 'size-5'
-                  )}
+                  className={cn(isCreateButton ? 'size-7' : 'size-5')}
                 />
 
                 {isCreateButton && ( // Hide label for Create button

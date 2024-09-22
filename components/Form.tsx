@@ -1,172 +1,398 @@
 'use client'
 
-import { useForm, type SubmitHandler } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { schema, type FormValues } from '@/types/schema'
-import { createPost } from '@/lib/actions.listing'
-import { UploadButton } from '@/lib/uploadthing'
-import { useRouter } from 'next/navigation'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
 
-export default function Form() {
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    formState: { errors, isSubmitting },
-  } = useForm<FormValues>({
-    resolver: zodResolver(schema),
+import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
+import { toast } from '@/hooks/use-toast'
+import { CreatePostSchema } from '@/types/schema'
+import { useEffect, type ChangeEvent, type FormEvent } from 'react'
+import { Input } from './ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from './ui/select'
+import { UploadButton } from '@/lib/uploadthing'
+import { createPost } from '@/lib/actions.listing'
+
+export default function CreatePostForm() {
+  const form = useForm<z.infer<typeof CreatePostSchema>>({
+    resolver: zodResolver(CreatePostSchema),
+    defaultValues: {
+      close_to: 'main',
+      watersupply_available: false,
+      wifi_available: false,
+    },
   })
 
-  const router = useRouter()
-  const onSubmit: SubmitHandler<FormValues> = (data) => {
-    createPost(data)
-    router.refresh( )
+  useEffect(() => {
+    form.reset()
+  }, [])
+
+  async function onSubmit(data: z.infer<typeof CreatePostSchema>) {
+    try {
+      await createPost(data)
+      toast({
+        title: 'Property Added Successfully',
+      })
+    } catch (error) {
+      console.log(error)
+    }
+
+    form.reset()
   }
 
-  function InputFieldError({ text = '' }: { text?: string }) {
-    return <p className="text-red-500">{text}</p>
+  function handleLocationClick(e: FormEvent) {
+    e.preventDefault()
+    console.log(form.formState.errors)
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords
+          form.setValue('latitude', latitude)
+          form.setValue('longitude', longitude)
+          console.log(position.coords)
+        },
+        (error) => {
+          console.error('Error getting location:', error)
+        }
+      )
+    } else {
+      console.error('Geolocation is not supported by this browser.')
+    }
   }
-
-  console.log(errors)
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <div>
-        <label htmlFor="title">Title</label>
-        <input id="title" {...register('title')} />
-        {errors.title && <InputFieldError text={errors.title.message} />}
-      </div>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5 pb-20">
+        <section className="space-y-5">
+          <h2 className="text-2xl font-bold">Property Details</h2>
+          <div className="grid grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Property Name</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    This is used for search filtering later.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-      <div>
-        <label htmlFor="address">Address</label>
-        <input id="address" {...register('address')} />
-        {errors.address && <InputFieldError text={errors.address.message} />}
-      </div>
+            <FormField
+              control={form.control}
+              name="price"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Rent</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                        field.onChange(parseInt(event.target.value))
+                      }
+                    />
+                  </FormControl>
+                  <FormDescription>Monthly cost of rent.</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-      <div>
-        <label htmlFor="price">Price</label>
-        <input
-          id="price"
-          type="number"
-          step="0.01"
-          {...register('price', { valueAsNumber: true })}
-        />
-        {errors.price && <InputFieldError text={errors.price.message} />}
-      </div>
+            <FormField
+              control={form.control}
+              name="bedroom_no"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Bedrooms</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                        field.onChange(parseInt(event.target.value))
+                      }
+                    />
+                  </FormControl>
+                  <FormDescription>How many bedrooms?</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-      <div>
-        <label htmlFor="latitude">Latitude</label>
-        <input
-          id="latitude"
-          type="number"
-          step="0.01"
-          {...register('latitude', { valueAsNumber: true })}
-        />
-        {errors.latitude && <InputFieldError text={errors.latitude.message} />}
-      </div>
+            <FormField
+              control={form.control}
+              name="bathroom_no"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Bathrooms</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                        field.onChange(parseInt(event.target.value))
+                      }
+                    />
+                  </FormControl>
+                  <FormDescription>How many bathrooms?</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        </section>
 
-      <div>
-        <label htmlFor="longitude">Longitude</label>
-        <input
-          id="longitude"
-          type="number"
-          step="0.01"
-          {...register('longitude', { valueAsNumber: true })}
-        />
-        {errors.longitude && (
-          <InputFieldError text={errors.longitude.message} />
-        )}
-      </div>
+        <section className="space-y-5">
+          <h2 className="text-2xl font-bold">Property Address</h2>
+          <div className="grid grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="address"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Address</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    Please provide the full address and street name of your
+                    property.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-      <div>
-        <label htmlFor="bedroom_no">Bedroom Number</label>
-        <input
-          id="bedroom_no"
-          type="number"
-          {...register('bedroom_no', { valueAsNumber: true })}
-        />
-        {errors.bedroom_no && (
-          <InputFieldError text={errors.bedroom_no.message} />
-        )}
-      </div>
+            <FormField
+              control={form.control}
+              name="close_to"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nearest Campus</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue
+                          defaultValue="both"
+                          placeholder="Select Campus"
+                        />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="main">Main Campus</SelectItem>
+                      <SelectItem value="west">West Campus</SelectItem>
+                      <SelectItem value="both">Both Campuses</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormDescription>
+                    Which campus is closest to your property?
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-      <div>
-        <label htmlFor="bathroom_no">Bathroom Number</label>
-        <input
-          id="bathroom_no"
-          type="number"
-          {...register('bathroom_no', { valueAsNumber: true })}
-        />
-        {errors.bathroom_no && (
-          <InputFieldError text={errors.bathroom_no.message} />
-        )}
-      </div>
+            <FormDescription className="col-span-2">
+              Please provide your precise property location.
+            </FormDescription>
 
-      <div>
-        <label htmlFor="wifi_available">Wi-Fi Available</label>
-        <input
-          id="wifi_available"
-          type="checkbox"
-          {...register('wifi_available')}
-        />
-      </div>
+            <FormField
+              control={form.control}
+              name="latitude"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Latitude</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      id="latitude"
+                      onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                        field.onChange(parseFloat(event.target.value))
+                      }
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-      <div>
-        <label htmlFor="watersupply_available">Water Supply Available</label>
-        <input
-          id="watersupply_available"
-          type="checkbox"
-          {...register('watersupply_available')}
-        />
-      </div>
+            <FormField
+              control={form.control}
+              name="longitude"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Longitude</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      id="longitude"
+                      onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                        field.onChange(parseFloat(event.target.value))
+                      }
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
-      <div>
-        <label htmlFor="close_to">Close To</label>
-        <select id="close_to" {...register('close_to')}>
-          <option value="west">West</option>
-          <option value="main">Main</option>
-          <option value="both">Both</option>
-        </select>
-        {errors.close_to && <InputFieldError text={errors.close_to.message} />}
-      </div>
+          <FormDescription className="text-center">
+            Alternatively, you can use your device to determine the property
+            location.
+          </FormDescription>
 
-      <div>
-        <label htmlFor="owner_name">Owner Name</label>
-        <input id="owner_name" {...register('owner_name')} />
-        {errors.owner_name && (
-          <InputFieldError text={errors.owner_name.message} />
-        )}
-      </div>
+          <Button onClick={handleLocationClick} className="w-full">
+            Use Device Location
+          </Button>
+        </section>
 
-      <div>
-        <label htmlFor="owner_contact">Owner Contact</label>
-        <input id="owner_contact" {...register('owner_contact')} />
-        {errors.owner_contact && (
-          <InputFieldError text={errors.owner_contact.message} />
-        )}
-      </div>
+        <section className="space-y-5">
+          <h2 className="text-2xl font-bold">What do your property offer?</h2>
+          <div className="grid grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="wifi_available"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormLabel>Wifi available</FormLabel>
+                    <FormDescription>
+                      Does your property offer wifi or internet?
+                    </FormDescription>
+                  </div>
+                </FormItem>
+              )}
+            />
 
-      <UploadButton
-        endpoint="imageUploader"
-        onClientUploadComplete={(res) => {
-          console.log(res)
-          setValue(
-            'images',
-            res.map((item) => item?.url)
-          )
-        }}
-        onUploadError={(error: Error) => {
-          alert(`ERROR! ${error.message}`)
-        }}
-      />
-      {errors.images && <InputFieldError text={errors.images.message} />}
-      <button
-        type="submit"
-        onClick={handleSubmit(onSubmit)}
-        disabled={isSubmitting}
-      >
-        {isSubmitting ? 'Submitting...' : 'Submit'}
-      </button>
-    </form>
+            <FormField
+              control={form.control}
+              name="watersupply_available"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormLabel>Water Supply</FormLabel>
+                    <FormDescription>
+                      Does your property have a water source.
+                    </FormDescription>
+                  </div>
+                </FormItem>
+              )}
+            />
+          </div>
+        </section>
+
+        <section className="space-y-5">
+          <h2 className="text-2xl font-bold">Owner Details</h2>
+          <div className="grid grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="owner_name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Full Name</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    Please provide your fullname.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="owner_contact"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Contact No.</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    Please provide your phone number.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        </section>
+
+        <section className="space-y-5">
+          <h2 className="text-2xl font-bold">Upload Images</h2>
+          <FormField
+            control={form.control}
+            name="images"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Upload up to 4 images</FormLabel>
+                <FormControl>
+                  <UploadButton
+                    appearance={{
+                      button: {
+                        width: '100%',
+                      },
+                    }}
+                    endpoint="imageUploader"
+                    onClientUploadComplete={(res) => {
+                      console.log(res)
+                      form.setValue(
+                        'images',
+                        res.map((item) => item?.url)
+                      )
+                    }}
+                    onUploadError={(error: Error) => {
+                      alert(`ERROR! ${error.message}`)
+                    }}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </section>
+
+        <Button className="w-full" type="submit">
+          Submit
+        </Button>
+      </form>
+    </Form>
   )
 }
