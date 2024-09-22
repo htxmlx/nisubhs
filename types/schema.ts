@@ -27,5 +27,3 @@ export const CreatePostSchema = z.object({
   owner_contact: z.string().min(1, 'Owner Contact is required'),
   images: z.array(z.string().url('Invalid URL format for image')),
 })
-
-export type FormValues = z.infer<typeof schema>

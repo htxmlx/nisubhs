@@ -51,6 +51,10 @@ export default function CreatePostForm() {
       })
     } catch (error) {
       console.log(error)
+      toast({
+        title: 'Uh oh! Something went wrong.',
+        variant: 'destructive',
+      })
     }
 
     form.reset()
