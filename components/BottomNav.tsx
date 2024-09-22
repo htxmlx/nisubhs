@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import { HeartFilledIcon } from '@radix-ui/react-icons'
+import { HeartIcon } from '@radix-ui/react-icons'
 import { Home, Map, PlusSquare, User2Icon } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -11,7 +11,7 @@ const navItems = [
   { href: '/', label: 'Home', icon: Home },
   { href: '/map', label: 'Map', icon: Map },
   { href: '/create', label: 'Create', icon: PlusSquare },
-  { href: '/save', label: 'Saved', icon: HeartFilledIcon },
+  { href: '/save', label: 'Saved', icon: HeartIcon },
   { href: '/profile', label: 'Profile', icon: User2Icon },
 ]
 
