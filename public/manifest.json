@@ -1,11 +1,6 @@
 {
   "name": "Nisubhs",
   "short_name": "Nisubhs",
-  "theme_color": "#FFFFFF",
-  "background_color": "#FFFFFF",
-  "start_url": "/",
-  "display": "standalone",
-  "orientation": "portrait",
   "icons": [
     {
       "src": "/icon-192x192.png",
@@ -18,14 +13,14 @@
       "type": "image/png"
     },
     {
-      "src": "/icon-388x388.png",
-      "sizes": "388x388",
-      "type": "image/png"
-    },
-    {
       "src": "/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
-  ]
+  ],
+  "theme_color": "#FFFFFF",
+  "background_color": "#FFFFFF",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait"
 }
