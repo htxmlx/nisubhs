@@ -49,7 +49,7 @@ export function CategoryTabs({ posts }: CategoryTabsProps) {
       <div className="grid grid-cols-2 gap-4">
         {filteredPosts.length
           ? filteredPosts.map((data) => (
-              <Link href={`details?id=${data.id}`} key={data.id}>
+              <Link href={`/details?id=${data.id}`} key={data.id}>
                 <ListingCard {...data} />
               </Link>
             ))
@@ -64,33 +64,33 @@ interface ListingCardProps extends Post {
 }
 
 function ListingCard({
-id,
-address,
-images,
-title,
-price,
-averageRating,
+  id,
+  address,
+  images,
+  title,
+  price,
+  averageRating,
 }: ListingCardProps) {
-return (
-  <Card className="overflow-hidden">
-    <Image
-      src={images[0]}
-      alt={title}
-      height={300}
-      width={300}
-      className="aspect-video"
-    />
-    <CardContent className="p-4">
-      <h2 className="font-semibold text-lg">{title}</h2>
-      <p className="text-muted-foreground">{address}</p>
-      <div className="flex justify-between items-center">
-        <span className="font-bold text-lg">₱{price}/mo</span>
-      </div>
-      <Badge variant="secondary" className="w-fit mt-2">
-        <StarFilledIcon className="h-4 w-4 mr-1 fill-primary" />
-        {averageRating}
-      </Badge>
-    </CardContent>
-  </Card>
-)
+  return (
+    <Card className="overflow-hidden">
+      <Image
+        src={images[0]}
+        alt={title}
+        height={300}
+        width={300}
+        className="aspect-video"
+      />
+      <CardContent className="p-4">
+        <h2 className="font-semibold text-lg">{title}</h2>
+        <p className="text-muted-foreground">{address}</p>
+        <div className="flex justify-between items-center">
+          <span className="font-bold text-lg">₱{price}/mo</span>
+        </div>
+        <Badge variant="secondary" className="w-fit mt-2">
+          <StarFilledIcon className="h-4 w-4 mr-1 fill-primary" />
+          {averageRating}
+        </Badge>
+      </CardContent>
+    </Card>
+  )
 }

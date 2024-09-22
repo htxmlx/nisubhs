@@ -38,7 +38,7 @@ export default async function Page() {
       <div className="grid grid-cols-2 gap-4">
         {listings.length
           ? listings.map((data) => (
-              <Link href={`details?id=${data.id}`} key={data.id}>
+              <Link href={`/details?id=${data.id}`} key={data.id}>
                 <ListingCard {...data} />
               </Link>
             ))
