@@ -57,7 +57,7 @@ export default async function Page({
   })
 
   return (
-    <Section className="gap-5 flex flex-col justify-between pb-20">
+    <Section className="gap-5 flex flex-col justify-between">
       <div className="grid gap-4">
         <Carousel className="rounded-xl overflow-hidden">
           <CarouselContent>

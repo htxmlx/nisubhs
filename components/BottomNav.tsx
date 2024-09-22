@@ -11,7 +11,7 @@ const navItems = [
   { href: '/', label: 'Home', icon: Home },
   { href: '/map', label: 'Map', icon: Map },
   { href: '/create', label: 'Create', icon: PlusSquare },
-  { href: '/save', label: 'Saved', icon: HeartIcon },
+  { href: '/saved', label: 'Saved', icon: HeartIcon },
   { href: '/profile', label: 'Profile', icon: User2Icon },
 ]
 
@@ -38,7 +38,9 @@ export default function BottomNav() {
             >
               <Link href={item.href}>
                 <item.icon
-                  className={cn(isCreateButton ? 'size-7' : 'size-5')}
+                  className={cn(
+                    isCreateButton ? 'size-7 text-white' : 'size-5'
+                  )}
                 />
 
                 {isCreateButton && ( // Hide label for Create button
